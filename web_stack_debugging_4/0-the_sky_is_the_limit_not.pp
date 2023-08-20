@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
-# Command to make an nginx server listen on port 80, shorter version
-sed -i 's/8080/80/g' /etc/nginx/sites-enabled/default
-pkill -1 nginx
+# fix our stack so that we get to 0 errors
+exec { 'file limit':
+  onlyif   => 'test -e /etc/default/nginx',
+  command  => 'sed -i "5s/[0-9]\+/$( ulimit -n )/" /etc/default/nginx; service nginx restart',
+  provider => shell,
+}
